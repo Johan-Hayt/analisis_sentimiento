@@ -1,7 +1,9 @@
 from langchain_core.runnables import RunnableLambda
 from langchain_openai import ChatOpenAI
 import json
+from dotenv import load_dotenv
 
+load_dotenv()
 
 
 
@@ -18,7 +20,7 @@ preprocess = RunnableLambda(prepocess_text)
 
 
 # Generador de Resúmenes
-def generate_summary(llm: ChatOpenAI, text:str)->str:
+def generate_summary(text:str)->str:
     """Genera un resumen conciso del texto"""
     prompt = f"Resume en una sola oración {text}"
     response = llm.invoke(prompt)
@@ -27,7 +29,7 @@ def generate_summary(llm: ChatOpenAI, text:str)->str:
 
 
 # Analizador de Sentimientos
-def analyze_sentiment(llm: ChatOpenAI, text: str)->json:
+def analyze_sentiment(text: str)->json:
     """Analiza el sentimiento y devuelve resultador estructurado"""
     prompt = f"""Analiza el sentimiento del siguiente texto.
             Respondes ÚNICAMENTE en formato JSON válido:
