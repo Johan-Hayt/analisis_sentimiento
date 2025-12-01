@@ -90,14 +90,26 @@ chain = preprocess | parallel_branch | merge_branch
 
 
 
-textos_prueba = [
+# textos_prueba = [
+#     "¡Me encanta este producto! Funciona perfectamente y llegó muy rápido.",
+#     "El servicio al cliente fue terrible, nadie me ayudó con mi problema.",
+#     "El clima está nublado hoy, probablemente llueva más tarde."
+# ]
+
+# for texto in textos_prueba:
+#     resultado = chain.invoke(texto)
+#     print(f"Texto: {texto}")
+#     print(f"Resultado: {resultado}")
+#     print("-"*50)
+
+# Prueba en Lote
+reviews_batch = [
     "¡Me encanta este producto! Funciona perfectamente y llegó muy rápido.",
     "El servicio al cliente fue terrible, nadie me ayudó con mi problema.",
     "El clima está nublado hoy, probablemente llueva más tarde."
 ]
 
-for texto in textos_prueba:
-    resultado = chain.invoke(texto)
-    print(f"Texto: {texto}")
-    print(f"Resultado: {resultado}")
-    print("-"*50)
+#Implementación de procesamiento en lote
+resultados = chain.batch(reviews_batch)
+
+print(f"Resultados de procesamiento en lote: {resultados}")
