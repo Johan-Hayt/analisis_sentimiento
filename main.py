@@ -1,4 +1,4 @@
-from langchain_core.runnables import RunnableLambda
+from langchain_core.runnables import RunnableLambda, RunnableParallel
 from langchain_openai import ChatOpenAI
 import json
 from dotenv import load_dotenv
@@ -26,7 +26,7 @@ def generate_summary(text:str)->str:
     response = llm.invoke(prompt)
     return response.content
 
-
+summary_branch = RunnableLambda(generate_summary)
 
 # Analizador de Sentimientos
 def analyze_sentiment(text: str)->json:
@@ -49,7 +49,7 @@ def analyze_sentiment(text: str)->json:
     except json.JSONDecodeError:
         return {"sentimiento": "neutro", "razón": "Error en análisis"}
 
-
+sentiment_branch = RunnableLambda(analyze_sentiment)
 
 # Función de Combinación
 def merge_results(data):
@@ -60,22 +60,34 @@ def merge_results(data):
         "razón": data["sentimiento_data"]["razón"]
     }
 
+merge_branch = RunnableLambda(merge_results)
 
 # Función de Procesamiento Principal
-def process_one(t):
-    resumen = generate_summary(t)           # Llamada 1 al LLM
-    sentimiento_data = analyze_sentiment(t) # Llamada 2 al LLM
-    return merge_results({
-        "resumen": resumen,
-        "sentimiento_data": sentimiento_data
-    }
-)
+# def process_one(t):
+#     resumen = generate_summary(t)           # Llamada 1 al LLM
+#     sentimiento_data = analyze_sentiment(t) # Llamada 2 al LLM
+#     return merge_results({
+#         "resumen": resumen,
+#         "sentimiento_data": sentimiento_data
+#     }
+# )
 
 # Convertir en Runnable
-process = RunnableLambda(process_one)
+# process = RunnableLambda(process_one)
 
 # 7. Construcción de la Cadena Final
-chain = preprocess | process
+# chain = preprocess | process
+
+
+#Implementación de cadenas paralelas con RunnableParallel
+parallel_branch = RunnableParallel({
+    "resumen": summary_branch,
+    "sentimiento_data": sentiment_branch,
+})
+
+# Implementación de la nueva cadena
+chain = preprocess | parallel_branch | merge_branch
+
 
 
 textos_prueba = [
